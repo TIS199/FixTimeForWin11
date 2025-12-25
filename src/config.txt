@@ -1,0 +1,23 @@
+# TimeFix Configuration File
+# -----------------------------
+
+# NTP Server to use for time synchronization
+# Defaults to pool.ntp.org if not specified
+NTPServer=pool.ntp.org
+
+# Optional: Custom DNS Server to use for resolving the NTP Server
+# Examples: 8.8.8.8 (Google), 1.1.1.1 (Cloudflare)
+# Leave empty or comment out to use system default DNS
+DNSServer=8.8.8.8
+
+# Number of seconds to wait between retry attempts if internet is offline
+RetryDelay=5
+
+# Maximum number of retries before giving up (set to 0 for infinite loop until success)
+MaxRetries=0
+
+# Timezone ID to set (use 'tzutil /l' in cmd to see list)
+# Default: Bangladesh Standard Time (GMT+6)
+# Examples: "Pacific Standard Time", "UTC", "India Standard Time"
+TimeZone=Bangladesh Standard Time
+
