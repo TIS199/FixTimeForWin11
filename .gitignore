@@ -18,3 +18,7 @@ env/
 
 # Exceptions
 !config.txt
+
+# Development
+generate_tz.py
+temp_timezones.txt
