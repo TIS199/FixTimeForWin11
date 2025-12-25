@@ -4,72 +4,65 @@ FixTime is a specialized Windows utility designed to reliably synchronize your s
 
 ## Why FixTime?
 
-- **Direct NTP Sync:** Connects directly to NTP servers (UDP port 123) rather than relying on `w32tm`.
-- **Advanced Configuration:** Supports setting Timezone, retries, and custom DNS servers for environments with specific network restrictions.
+- **Direct NTP Sync:** Connects directly to NTP servers (UDP port 123).
+- **Advanced Configuration:** Supports setting Timezone, retries, and custom DNS servers.
 - **Resilient:** Waits for network availability and retries connection before giving up.
-- **Silent Operation:** Designed to run in the background (no console window) and exit immediately upon success.
+- **Silent Operation:** Runs in the background (no console window).
 
-## When to Use
+## Installation
 
-- **Dual Booting:** Corrects the time offset often caused by switching between Windows (Local Time) and Linux/macOS (UTC).
-- **Dead CMOS Battery:** Automatically restores the correct time at startup if your hardware clock resets.
-- **DNS Issues:** Can use a specific DNS server (e.g., Google or Cloudflare) to resolve the NTP pool if your local ISP DNS is flaky.
+### 1. Extract Files & Create Folder
+1.  Create a folder named **`C:\FixTimeForWin11`**.
+    > **Note:** Ideally, use this exact path because the included launcher script (`timefix.bat`) is pre-configured for it. If you use a different path, you must edit `timefix.bat` with Notepad.
+2.  Extract the contents of the zip (`TimeFix.exe`, `config.txt`, `timefix.bat`) into this folder.
 
-## Installation & Setup (Task Scheduler)
+### 2. Configure Task Scheduler (The "Set and Forget" Method)
+To ensure FixTime runs at startup with the highest privileges and *without* any user prompts:
 
-For best results, run FixTime at startup with administrative privileges.
+1.  Press `Win + R`, type `taskschd.msc`, and press Enter.
+2.  Click **"Create Task..."** (❌ NOT "Create Basic Task").
 
-1.  **Open Task Scheduler** (`taskschd.msc`).
-2.  **Create a New Task** (not basic).
-3.  **General:**
-    - Name: `FixTime`
-    - User Account: `SYSTEM` (Search for "SYSTEM").
-    - **Run with highest privileges**: Checked.
-4.  **Triggers:**
-    - Start the task: **At startup**.
-5.  **Actions:**
-    - Action: **Start a program**.
-    - Program/script: Path to `TimeFix.exe`.
-    - **Start in:** The folder containing `TimeFix.exe` and `config.txt` (Critical for loading config).
-6.  **Conditions:**
-    - Uncheck "Start only if on AC power".
-    - Check "Start only if the following network connection is available" (Optional, but recommended).
+#### 🔐 General Tab
+- **Name:** `FixTime` (or `MyBackgroundAdminTask`)
+- **User Account:** Click "Change User or Group...", type `SYSTEM`, and click OK.
+    - ✅ **Why?** Running as SYSTEM completely bypasses UAC prompts.
+- **Run with highest privileges:** ☑ Checked.
+- **Configure for:** Windows 10 or Windows 11.
 
-## Configuration
+#### ⚡ Triggers Tab
+- Click **New...**
+- **Begin the task:** At startup.
+- **Enabled:** ☑ Checked.
 
-Settings are controlled via `config.txt` using a `Key=Value` format.
+#### ▶ Actions Tab
+- Click **New...**
+- **Action:** Start a program.
+- **Program/script:** Browse and select **`C:\FixTimeForWin11\timefix.bat`**.
+    - *Using the bat file ensures the working directory is set correctly every time.*
 
-**Key Parameters:**
+#### ⚙ Conditions Tab
+- **Start only if on AC power:** ☐ Uncheck (important for laptops).
 
-- `NTPServer`: The NTP server to query (default: `pool.ntp.org`).
-- `DNSServer`: (Optional) Specific DNS server IP to use for resolving the NTP host (e.g., `8.8.8.8`).
-- `TimeZone`: (Optional) The time zone ID to force set the system to (e.g., `Bangladesh Standard Time`, `UTC`, `Pacific Standard Time`).
-- `RetryDelay`: Seconds to wait between retries.
-- `MaxRetries`: Maximum number of attempts (0 = infinite, but recommended to set a limit like 10).
+#### 🛠 Settings Tab
+- **Allow task to be run on demand:** ☑ Checked.
 
-**Example `config.txt`:**
+### 🔒 Final Step
+Click **OK**. That's it! Windows will never ask for permission, and your time will sync automatically at every boot.
+
+## Configuration (`config.txt`)
+
+You can customize behavior by checking `config.txt` in the installation folder:
+
 ```ini
 NTPServer = pool.ntp.org
-# DNSServer = 1.1.1.1
+# DNSServer = 8.8.8.8  <-- Uncomment to force Google DNS for NTP resolution
 TimeZone = Bangladesh Standard Time
 RetryDelay = 5
 MaxRetries = 10
 ```
 
-## Compilation
+## Compilation (Optional)
 
-To build from source:
-
-1.  Active your virtual environment (if used).
-2.  Install requirements: `pip install pyinstaller`.
-3.  Run the build script:
-    ```cmd
-    build.bat
-    ```
-    Or manually:
-    ```cmd
-    python -m PyInstaller --onefile --noconsole --name TimeFix src/timefix.py
-    ```
-
-## License
-MIT License.
+If you want to build from source:
+1.  `pip install pyinstaller`
+2.  Run `build.bat`
